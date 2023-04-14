@@ -30,4 +30,16 @@ export class UserService{
     getAllUsers = () =>{
         return this.db
     }
+
+    deleteUser = (name:string, email:string) => {
+        const user = this.db.find((user)=> user.email === email)
+
+        if (!user) {
+            throw new Error("Unexpected error: user not found");
+        }
+        const userIndex = this.db.indexOf(user)
+
+        this.db.splice(userIndex,1)
+
+    }
 }

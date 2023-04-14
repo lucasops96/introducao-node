@@ -10,4 +10,5 @@ describe('UserService',()=>{
         userService.create('nath','nath@test.com');
         expect(mockConsole).toHaveBeenCalledWith('DB atualizado',mockDb)
     })
+
 })
