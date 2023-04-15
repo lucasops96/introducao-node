@@ -12,6 +12,7 @@ describe('UserController',()=>{
     }
 
     const userController = new UserController(mockUserService as UserService);
+    const mockResponse = makeMockResponse()
 
     it('Deve adicionar um novo usuário',()=>{
         const mockRequest = {
@@ -20,7 +21,7 @@ describe('UserController',()=>{
 	            email:"miguelDIO@gmail.com"
             }
         } as Request
-        const mockResponse = makeMockResponse() 
+         
         userController.createUser(mockRequest,mockResponse)
         expect(mockResponse.state.status).toBe(201)
         expect(mockResponse.state.json).toMatchObject({message:'User created'})
@@ -29,19 +30,31 @@ describe('UserController',()=>{
     it('Deve dá um erro por não ter nome de usuário quando for criar',()=>{
         const mockRequest = {
             body:{
-                
+                name:'',
 	            email:"miguelDIO@gmail.com"
             }
         } as Request
-        const mockResponse = makeMockResponse() 
+        
         userController.createUser(mockRequest,mockResponse)
         expect(mockResponse.state.status).toBe(400)
-        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Name obrigatório'})
+        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Name e Email dobrigatório'})
     })
 
-    it('Deve mostrat todos os usuários',()=>{
-        const mockRequest = {} as Request
-        const mockResponse = makeMockResponse() 
+    it('Deve dá um erro por não ter email de usuário quando for criar',()=>{
+        const mockRequest = {
+            body:{
+                name:'João Miguel',
+	            email:''
+            }
+        } as Request
+         
+        userController.createUser(mockRequest,mockResponse)
+        expect(mockResponse.state.status).toBe(400)
+        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Name e Email dobrigatório'})
+    })
+
+    it('Deve retornar todos os usuários',()=>{
+        const mockRequest = {} as Request 
         
         userController.getAllUsers(mockRequest,mockResponse)
         expect(mockResponse.state.status).toBe(200)
@@ -57,9 +70,8 @@ describe('UserController',()=>{
 	            email:"miguelDIO@gmail.com"
             }
         } as Request
-        const mockResponse = makeMockResponse() 
         
         userController.deleteUser(mockRequest,mockResponse)
-        expect(mockResponse.state.status).toBe(204)
+        expect(mockResponse.state.status).toBe(200)
     })
 })
