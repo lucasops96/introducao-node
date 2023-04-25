@@ -4,21 +4,32 @@ import { makeMockRequest } from "../__mocks__/mockRequest.mock";
 import { makeMockResponse } from "../__mocks__/mockResponse.mock";
 import { Request} from "express";
 
-describe('UserController',()=>{
-    const mockUserService:Partial<UserService>={
-        create:jest.fn(),
-        getAllUsers:jest.fn(),
-        deleteUser:jest.fn()
-    }
+const mockUserService = {
+    createUser: jest.fn()
+}
 
-    const userController = new UserController(mockUserService as UserService);
+jest.mock('../services/UserService',()=>{
+    return {
+        UserService: jest.fn().mockImplementation(()=>{
+            return mockUserService
+        })
+    }
+})
+
+describe('UserController',()=>{
+    // const mockUserService:Partial<UserService>={
+    //     createUser:jest.fn()
+    // }
+
+    const userController = new UserController();
     const mockResponse = makeMockResponse()
 
     it('Deve adicionar um novo usuário',()=>{
         const mockRequest = {
             body:{
                 name:"João Miguel",
-	            email:"miguelDIO@gmail.com"
+	            email:"miguelDIO@gmail.com",
+                password:'password'
             }
         } as Request
          
@@ -27,51 +38,61 @@ describe('UserController',()=>{
         expect(mockResponse.state.json).toMatchObject({message:'User created'})
     })
 
-    it('Deve dá um erro por não ter nome de usuário quando for criar',()=>{
+    it('Deve retornar erro caso o usuário não informe o name',()=>{
         const mockRequest = {
             body:{
                 name:'',
-	            email:"miguelDIO@gmail.com"
+	            email:"miguelDIO@gmail.com",
+                password:'password'
             }
         } as Request
         
         userController.createUser(mockRequest,mockResponse)
         expect(mockResponse.state.status).toBe(400)
-        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Name e Email dobrigatório'})
+        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Todos os campos são obrigatório'})
     })
 
-    it('Deve dá um erro por não ter email de usuário quando for criar',()=>{
+    it('Deve retornar erro caso o usuário não informe o email',()=>{
         const mockRequest = {
             body:{
                 name:'João Miguel',
-	            email:''
+	            email:'',
+                password:'password'
             }
         } as Request
          
         userController.createUser(mockRequest,mockResponse)
         expect(mockResponse.state.status).toBe(400)
-        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Name e Email dobrigatório'})
+        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Todos os campos são obrigatório'})
     })
 
-    it('Deve retornar todos os usuários',()=>{
-        const mockRequest = {} as Request 
-        
-        userController.getAllUsers(mockRequest,mockResponse)
-        expect(mockResponse.state.status).toBe(200)
-    })
-
-    it('Deletar usuário',()=>{
-        const userController = new UserController( 
-            new UserService([{name:"João Miguel",email:"miguelDIO@gmail.com"}]));
-        
+    it('Deve retornar erro caso o usuário não informe o password',()=>{
         const mockRequest = {
             body:{
-                name:"João Miguel",
-	            email:"miguelDIO@gmail.com"
+                name:'João Miguel',
+	            email:'miguelDIO@gmail.com',
+                password:''
             }
         } as Request
-        
-        userController.deleteUser(mockRequest,mockResponse)
-        expect(mockResponse.state.status).toBe(200)
+         
+        userController.createUser(mockRequest,mockResponse)
+        expect(mockResponse.state.status).toBe(400)
+        expect(mockResponse.state.json).toMatchObject({message:'Bad request! Todos os campos são obrigatório'})
     })
+
+    
+
+    // it('Deletar usuário',()=>{
+        
+        
+    //     const mockRequest = {
+    //         body:{
+    //             name:"João Miguel",
+	//             email:"miguelDIO@gmail.com"
+    //         }
+    //     } as Request
+        
+    //     userController.deleteUser(mockRequest,mockResponse)
+    //     expect(mockResponse.state.status).toBe(200)
+    // })
 })
