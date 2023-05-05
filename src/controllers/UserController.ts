@@ -19,8 +19,16 @@ export class UserController {
         return response.status(201).json({message:'User created'})
     }
 
-    getUser = (request:Request,response:Response)=>{
-        return response.status(200)
+    getUser = async (request:Request,response:Response)=>{
+        const { userId } = request.params
+
+        const user = await this.userService.getUser(userId) 
+
+        return response.status(200).json({
+            userID:user?.id_user,
+            name:user?.name,
+            email:user?.email
+        })
     }
 
     deleteUser = (request:Request,response:Response)=>{
